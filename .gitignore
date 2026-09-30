@@ -1,0 +1,12 @@
+ts/node_modules/
+ts/dist/
+/matii
+/matii-operator
+dist/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+terraform/terraform-provider-matii
+bin/
+/bin/
+csi/matii-csi-provider

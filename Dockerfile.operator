@@ -1,0 +1,11 @@
+FROM golang:1.26-alpine AS build
+WORKDIR /src
+COPY go/go.mod go/go.sum ./
+RUN go mod download
+COPY go/ ./
+RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /matii-operator ./cmd/matii-operator
+
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY --from=build /matii-operator /matii-operator
+USER 10001:10001
+ENTRYPOINT ["/matii-operator"]

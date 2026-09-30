@@ -1,0 +1,41 @@
+# Matii provider for the Secrets Store CSI Driver (install the driver first:
+# https://secrets-store-csi-driver.sigs.k8s.io). The driver must pass pod
+# service account tokens for the Matii audience:
+#
+#   helm upgrade --install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver \
+#     -n kube-system --set tokenRequests[0].audience=matii-secret-service
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: matii-csi-provider
+  namespace: kube-system
+  labels: { app: matii-csi-provider }
+spec:
+  selector:
+    matchLabels: { app: matii-csi-provider }
+  template:
+    metadata:
+      labels: { app: matii-csi-provider }
+    spec:
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      containers:
+        - name: provider
+          image: matii/secret-csi-provider:latest   # pin a digest in production
+          args: ["--endpoint=/provider/matii.sock"]
+          env:
+            - name: MATII_ALLOWED_HOSTS
+              value: https://secrets.example.com    # the Secret Services pods may use
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 128Mi }
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: providervol, mountPath: /provider }
+      volumes:
+        - name: providervol
+          hostPath: { path: /etc/kubernetes/secrets-store-csi-providers, type: DirectoryOrCreate }
+      nodeSelector: { kubernetes.io/os: linux }

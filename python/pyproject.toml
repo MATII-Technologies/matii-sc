@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "matii-secrets"
+version = "0.1.0"
+description = "Client for the Matii Secret Service: server-side and end-to-end encrypted apps, workload identity, dynamic credentials."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["PyNaCl>=1.5,<2"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

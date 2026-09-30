@@ -1,0 +1,20 @@
+# In the app's namespace: the ServiceAccount whose token is exchanged, and the
+# MatiiSecret. In the Secret Service, create a Kubernetes OIDC identity trusting
+# system:serviceaccount:payments:payments-reader and attach it to the Matii
+# service account below.
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: payments-reader, namespace: payments }
+---
+apiVersion: secrets.matii.io/v1alpha1
+kind: MatiiSecret
+metadata: { name: payments, namespace: payments }
+spec:
+  serviceAccountId: 00000000-0000-0000-0000-000000000000
+  kubernetesServiceAccount: payments-reader
+  app: Payments
+  env: production
+  secretName: payments-secrets
+  refreshSeconds: 60
+  rolloutRestart:
+    - { kind: Deployment, name: payments-api }

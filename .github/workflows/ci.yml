@@ -1,0 +1,58 @@
+name: CI
+on: [push, pull_request]
+permissions: { contents: read }
+jobs:
+  go:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: { go-version-file: go/go.mod, cache-dependency-path: go/go.sum }
+      - run: go vet ./... && go test -race ./...
+        working-directory: go
+  ts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24 }
+      - run: npm ci && npm test && npm run build
+        working-directory: ts
+  csi:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: { go-version-file: csi/go.mod, cache-dependency-path: csi/go.sum }
+      - run: go vet ./... && go test -race ./...
+        working-directory: csi
+  terraform:
+    runs-on: ubuntu-24.04
+    env: { TOFU_VERSION: "1.12.6" }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: { go-version-file: terraform/go.mod, cache-dependency-path: terraform/go.sum }
+      - name: OpenTofu (checksum-verified)
+        run: |
+          base=https://github.com/opentofu/opentofu/releases/download/v$TOFU_VERSION
+          curl -fsSLO "$base/tofu_${TOFU_VERSION}_linux_amd64.zip" && curl -fsSLO "$base/tofu_${TOFU_VERSION}_SHA256SUMS"
+          grep "tofu_${TOFU_VERSION}_linux_amd64.zip" "tofu_${TOFU_VERSION}_SHA256SUMS" | sha256sum -c -
+          unzip -q "tofu_${TOFU_VERSION}_linux_amd64.zip" tofu && echo "TF_ACC_TERRAFORM_PATH=$PWD/tofu" >> "$GITHUB_ENV"
+      - run: go vet ./... && TF_ACC=1 TF_ACC_PROVIDER_NAMESPACE=matii-org go test ./...
+        working-directory: terraform
+  python:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[test]" && pytest -q
+        working-directory: python
+  images:
+    needs: [go]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: sh -n install.sh && scripts/dist.sh ci-check
+      - run: docker build -f Dockerfile.cli -t matii-cli . && docker build -f Dockerfile.operator -t matii-operator . && docker build -f Dockerfile.csi -t matii-csi .

@@ -1,0 +1,35 @@
+name: Release
+# Tag vX.Y.Z to publish CLI binaries (matii_<os>_<arch>, SHA256SUMS, install.sh)
+# as release assets. Mirror them to the URL set as MATII_CLI_DOWNLOAD_URL in the
+# console. Images are pushed only when the IMAGE_REGISTRY variable is set.
+on:
+  push:
+    tags: ["v*"]
+permissions: { contents: write, packages: write }
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: { go-version-file: go/go.mod, cache-dependency-path: go/go.sum }
+      - run: go vet ./... && go test -race ./...
+        working-directory: go
+      - run: scripts/dist.sh "${GITHUB_REF_NAME}"
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          files: dist/*
+          fail_on_unmatched_files: true
+      - name: Images
+        if: vars.IMAGE_REGISTRY != ''
+        env:
+          REGISTRY: ${{ vars.IMAGE_REGISTRY }}
+          REGISTRY_USER: ${{ secrets.IMAGE_REGISTRY_USER }}
+          REGISTRY_PASSWORD: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+        run: |
+          echo "$REGISTRY_PASSWORD" | docker login "${REGISTRY%%/*}" -u "$REGISTRY_USER" --password-stdin
+          for image in cli operator csi; do
+            name=$image; [ "$image" = csi ] && name=csi-provider
+            docker build -f "Dockerfile.$image" -t "$REGISTRY/secret-$name:${GITHUB_REF_NAME#v}" .
+            docker push "$REGISTRY/secret-$name:${GITHUB_REF_NAME#v}"
+          done

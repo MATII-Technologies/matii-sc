@@ -1,0 +1,74 @@
+name: Matii Secrets
+description: Load secrets from the Matii Secret Service into the job, using GitHub OIDC (no stored token).
+branding: { icon: lock, color: green }
+inputs:
+  host:
+    description: Console URL, e.g. https://secrets.example.com
+    required: true
+  app:
+    description: App name
+    required: true
+  env:
+    description: Environment name, e.g. production
+    required: true
+  path:
+    description: Folder path (optional)
+    required: false
+    default: ""
+  service-account-id:
+    description: Service account with a GitHub Actions OIDC identity attached (workload identity)
+    required: false
+  audience:
+    description: Audience of the GitHub ID token (must match the identity)
+    required: false
+    default: matii-secret-service
+  token:
+    description: Static service account token instead of OIDC (discouraged; pass from a secret)
+    required: false
+  export-env:
+    description: Export secrets as job environment variables (values are masked)
+    required: false
+    default: "true"
+  dotenv-file:
+    description: Also write a .env file to this path (mode 0600)
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: ${{ github.action_path }}/../go/go.mod
+        cache-dependency-path: ${{ github.action_path }}/../go/go.sum
+    - name: Build matii CLI
+      shell: bash
+      working-directory: ${{ github.action_path }}/../go
+      run: go build -trimpath -o "$RUNNER_TEMP/matii" ./cmd/matii
+    - name: Load secrets
+      shell: bash
+      env:
+        MATII_HOST: ${{ inputs.host }}
+        MATII_TOKEN: ${{ inputs.token }}
+        MATII_SERVICE_ACCOUNT_ID: ${{ inputs.service-account-id }}
+        MATII_OIDC_PROVIDER: github-actions
+        MATII_OIDC_AUDIENCE: ${{ inputs.audience }}
+        INPUT_APP: ${{ inputs.app }}
+        INPUT_ENV: ${{ inputs.env }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_EXPORT_ENV: ${{ inputs.export-env }}
+        INPUT_DOTENV_FILE: ${{ inputs.dotenv-file }}
+      run: |
+        set -euo pipefail
+        if [ -z "${MATII_TOKEN}" ] && [ -z "${MATII_SERVICE_ACCOUNT_ID}" ]; then
+          echo "::error::Set service-account-id (recommended, OIDC) or token." >&2; exit 1
+        fi
+        [ -n "${MATII_TOKEN}" ] || unset MATII_TOKEN
+        args=(--app "$INPUT_APP" --env "$INPUT_ENV")
+        [ -z "$INPUT_PATH" ] || args+=(--path "$INPUT_PATH")
+        if [ "$INPUT_EXPORT_ENV" = "true" ]; then
+          "$RUNNER_TEMP/matii" secrets export "${args[@]}" --format github
+        fi
+        if [ -n "$INPUT_DOTENV_FILE" ]; then
+          umask 077
+          "$RUNNER_TEMP/matii" secrets export "${args[@]}" --format dotenv > "$INPUT_DOTENV_FILE"
+        fi

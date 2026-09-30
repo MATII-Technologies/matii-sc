@@ -1,0 +1,48 @@
+{
+  "token": "pss_service:v2:90a48e49da31c719f98ccc109e11b191536b756c0389f1767cafa0f3c1f3962b:2450553bada6d2162625bfc22d6949dd8d33d77791c73e215bdba429bf0f7246:81cfc3825d0f3c1ad7443fde23833df498e5e87dc2eaab62ff719e192109c8e1:1bc861aa245d453ee1dd24696966b1238430b491f4e608a1ff9c457db2edb15b",
+  "token_value": "90a48e49da31c719f98ccc109e11b191536b756c0389f1767cafa0f3c1f3962b",
+  "kx_public": "2450553bada6d2162625bfc22d6949dd8d33d77791c73e215bdba429bf0f7246",
+  "kx_private": "4ea76de99203f0f44ff3bd6101033064a5e8ccdfc98e4ea8a551f35ef9fab8a4",
+  "wrapped_key_share": "8ebf2184a0f4ee717de8666742b93d016dbd113d39ee4ff364c63dbba45da45fb592f3041102441bc14b1f541ea0dbd467cec2f7dd1730b1b69479f2388cbdb223136861edea4cd1c24bc05df93ad3b721b9aea20829049ed95494db481dde07995825ae4a8b2583",
+  "env_seed": "099bf601ba2279650c8ceb81b8cdb0c088cc4bde02022cb1fb265aafb133c384",
+  "env_salt": "b6a8c1bf4785242fc89e2e7cc31b5479bdf167738b9d9fe86fa92d3da6bae613",
+  "env_public": "e0eb9e51b3f89821ca732ccdbd7f352617b7492f7931a2306e0f88c5cfb57370",
+  "env_private": "0a62c6886271670140883bdbf9ec2d26b8f7c6fe339a0b9766df7c0d419b84c5",
+  "wrapped_seed": "ph:v1:73070c529e721e3734fa2451e77f56a9c51af8035d0d0b3b3755e46b04ab6461:jGq9mEgdJS5Onp528cGhb33J+2UjCuUKR2agLWDXxWSdqoys5dJnd7tPOb7yz+66ASJdslmWUicGHPNFQW0UGK5JLRQaMsLls+L+RDVnYy0PDFHnfxpy0u2exPsQOolmLaBfIrEh8+s=",
+  "wrapped_salt": "ph:v1:0fde2cae010b42ecbf438db07759eb41f98818f8cd60a87c98afd062d6d8955e:51eT1iA8eMMESIaDunwCyfP3TokRjxORUquL5up2dFIyB7xNZXM4GI+p9bBDKoTNAIperKsPxNC7YQOhr62BQFXF15eciCv2mq2hZaNZs9z8D1+irTpMvtvpjIwKjCGuLQ14itGR860=",
+  "secrets": [
+    {
+      "key": "DATABASE_URL",
+      "value": "postgres://u:p@db/x",
+      "key_ciphertext": "ph:v1:6bac1774262d740c2bc11ba2a4a570b3bf9a5d115810aa399b3cca8f8247106c:IzOEeiEZ+pgWU+gFF8rJlStmOykU4T/61yk/DAL5ulVMrDT9Nle72YgeiDvZlVK01DffFA==",
+      "value_ciphertext": "ph:v1:56f9fb73aa9f9eb134ddf0682eb974d8189a927a43c5e3cb668ebd050f51472a:w/bHpiJLuEj0Pk7xCrGL4AeZuzPXKFQhDVTJNNcY738c8yf3kNNZqH9omKO17cHDj6TdJHxH/ajkVFQ=",
+      "key_digest": "ad61c7bfb8a2b4d5973fa4b16a1fa36a392bbb1f6894c201d6644d9fe1a408fa"
+    },
+    {
+      "key": "EMPTY",
+      "value": "",
+      "key_ciphertext": "ph:v1:5df978bd4ef31e21e402fdb46182a2e130f72036b6d809585c595621eea88758:IuEBNysEfSocpGq7SK9xSPkpU++2Z42sMOEGL3I/jl69jFasUKgE5oAWEzHO",
+      "value_ciphertext": "ph:v1:8fed8639f382bdbc8ecce46c13ebcb0d4fc23ad34e536e580a9adc50db83f873:SuItK0Wd9ZEaOUyD+tV2xVUEyP85sVkyri64sAVgDMdxm/TMQfjLjw==",
+      "key_digest": "a11a668b249316111a53bd5e85ec3738db5e2e553c2595073116c09c6f957407"
+    },
+    {
+      "key": "UNICODE",
+      "value": "héllo ✓ 🔑",
+      "key_ciphertext": "ph:v1:8d68311dfec97a8a46d964db7d766500cf3ace673f1b83835aa0bf01e7abaa07:PQ6FfHnTtH1yU6SoO1CnRegv+nR3SgFeRzcWH9oCZdM7vDwzkuI4NUKtp9O5wvI=",
+      "value_ciphertext": "ph:v1:fe12bb9f859f1255bcc67f1765f69a97a82e69eee78918ab16761f731031ee64:0BTyF3xFgRoWm6cJzsaWpGkNEjyoYJ43CFGSIDFF0k4Ilvdocp1MsBUQMrVKBAiutt1dRlcj/w==",
+      "key_digest": "f5b8af6810f273ff6d1efb3fb2258b47712a850286ba234da1c0ddd25f7d8f54"
+    },
+    {
+      "key": "MULTI",
+      "value": "a\nb\"c",
+      "key_ciphertext": "ph:v1:725181a9d07400d0f51de620d9d66356bf70445b7e5c58b8bf41a71043b3456c:VTjtK6SYa9F0HYbOrSY9Elft6NB6zsnGr3SSNz1BoMqPYMS6wkSE4SAo/fc3",
+      "value_ciphertext": "ph:v1:b9195ae94acf2d2257e1f359629f6d27401dc208153d52c1e8b165771b71f30e:jf0AZ9HmQ4Dpth8k/a3fFWHS2GO0fEHo/3gWhUW/h/9prLE39MbinYLIjT5/",
+      "key_digest": "b8f72317134157c75f513574d4861dbedc47615096949905189b73c9070f2bbc"
+    }
+  ],
+  "kx_seed_keypair": {
+    "seed": "08a70a9826734c7b951f1e7c9612910721e299ca6f8bbe2762e9b02e6c998d78",
+    "public": "aa8b037fc828d90b8f11d6a0e1bf5bdf2b866506797483bc1c1698847e2dad4b",
+    "private": "f8141685ffe92a5c0d4628213198a4b45344d305270bf7f29b7c11f994d08f31"
+  }
+}

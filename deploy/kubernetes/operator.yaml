@@ -1,0 +1,67 @@
+# Cluster-wide install. To limit the operator to some namespaces, set
+# WATCH_NAMESPACE and replace the ClusterRole binding with a Role per namespace.
+apiVersion: v1
+kind: Namespace
+metadata: { name: matii-operator }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: matii-operator, namespace: matii-operator }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: { name: matii-operator }
+rules:
+  - apiGroups: [secrets.matii.io]
+    resources: [matiisecrets]
+    verbs: [get, list, watch]
+  - apiGroups: [secrets.matii.io]
+    resources: [matiisecrets/status]
+    verbs: [patch]
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, create, patch]
+  # Short-lived tokens for the ServiceAccounts named in MatiiSecrets; the
+  # Secret Service decides what each of them may read.
+  - apiGroups: [""]
+    resources: [serviceaccounts/token]
+    verbs: [create]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets, daemonsets]
+    verbs: [patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: { name: matii-operator }
+roleRef: { apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: matii-operator }
+subjects:
+  - { kind: ServiceAccount, name: matii-operator, namespace: matii-operator }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: matii-operator, namespace: matii-operator, labels: { app: matii-operator } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: matii-operator } }
+  template:
+    metadata: { labels: { app: matii-operator } }
+    spec:
+      serviceAccountName: matii-operator
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: operator
+          image: ghcr.io/matii-org/matii-operator:0.1.0
+          env:
+            - { name: MATII_HOST, value: "https://secrets.example.com" }
+            - { name: MATII_AUDIENCE, value: matii-secret-service }
+            - { name: WATCH_NAMESPACE, value: "" }
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 128Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }

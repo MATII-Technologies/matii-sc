@@ -1,0 +1,32 @@
+# In the Secret Service: create a Kubernetes OIDC identity trusting
+# system:serviceaccount:payments:payments-api and attach it to the service account below.
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata: { name: payments, namespace: payments }
+spec:
+  provider: matii
+  parameters:
+    host: https://secrets.example.com
+    serviceAccountId: 00000000-0000-0000-0000-000000000000
+    app: Payments
+    env: production
+    path: /backend                                   # optional folder
+    objects: '[{"key": "DB_URL", "file": "db-url"}]' # optional; default: every secret, one file per key
+    # format: dotenv                                  # or json: one file (.env / secrets.json)
+---
+apiVersion: v1
+kind: Pod
+metadata: { name: payments-api, namespace: payments }
+spec:
+  serviceAccountName: payments-api
+  containers:
+    - name: app
+      image: ghcr.io/example/payments-api:1.0
+      volumeMounts:
+        - { name: secrets, mountPath: /run/secrets/matii, readOnly: true }
+  volumes:
+    - name: secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes: { secretProviderClass: payments }

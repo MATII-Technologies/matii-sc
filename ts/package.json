@@ -1,0 +1,22 @@
+{
+  "name": "@matii/secrets",
+  "version": "0.1.0",
+  "description": "Client for the Matii Secret Service (SSE and end-to-end encrypted apps, workload identity).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "dependencies": {
+    "libsodium-wrappers": "0.7.15"
+  },
+  "devDependencies": {
+    "@types/libsodium-wrappers": "0.7.14",
+    "@types/node": "22.15.3",
+    "typescript": "5.8.3"
+  }
+}
