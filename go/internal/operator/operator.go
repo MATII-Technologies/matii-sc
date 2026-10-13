@@ -33,8 +33,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/matii-org/matii-secret-clients/go/internal/kube"
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/internal/kube"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 const (

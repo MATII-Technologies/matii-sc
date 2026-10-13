@@ -1,11 +1,11 @@
-module github.com/matii-org/matii-secret-clients/csi
+module github.com/MATII-Technologies/matii-sc/csi
 
 go 1.26.0
 
-toolchain go1.26.8
+toolchain go1.26.9
 
 require (
-	github.com/matii-org/matii-secret-clients/go v0.0.0
+	github.com/MATII-Technologies/matii-sc/go v0.0.0
 	google.golang.org/grpc v1.84.0
 	sigs.k8s.io/secrets-store-csi-driver v1.6.1
 )
@@ -19,4 +19,4 @@ require (
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
 )
 
-replace github.com/matii-org/matii-secret-clients/go => ../go
+replace github.com/MATII-Technologies/matii-sc/go => ../go

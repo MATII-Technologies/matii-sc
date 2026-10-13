@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 type secretsDataSource struct{ client *matii.Client }

@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 	pb "sigs.k8s.io/secrets-store-csi-driver/provider/v1alpha1"
 )
 

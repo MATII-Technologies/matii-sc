@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 	pb "sigs.k8s.io/secrets-store-csi-driver/provider/v1alpha1"
 
-	"github.com/matii-org/matii-secret-clients/csi/internal/csi"
+	"github.com/MATII-Technologies/matii-sc/csi/internal/csi"
 )
 
 var version = "dev"

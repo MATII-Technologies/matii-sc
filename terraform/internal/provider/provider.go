@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 type matiiProvider struct{ version string }

@@ -15,7 +15,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 // exporters render key → value maps (sorted by key) in each export format.

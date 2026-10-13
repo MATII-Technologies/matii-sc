@@ -1,14 +1,14 @@
-module github.com/matii-org/matii-secret-clients/terraform
+module github.com/MATII-Technologies/matii-sc/terraform
 
 go 1.26.0
 
-toolchain go1.26.8
+toolchain go1.26.9
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
 	github.com/hashicorp/terraform-plugin-go v0.31.0
 	github.com/hashicorp/terraform-plugin-testing v1.16.0
-	github.com/matii-org/matii-secret-clients/go v0.0.0
+	github.com/MATII-Technologies/matii-sc/go v0.0.0
 )
 
 require (
@@ -64,4 +64,4 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 )
 
-replace github.com/matii-org/matii-secret-clients/go => ../go
+replace github.com/MATII-Technologies/matii-sc/go => ../go

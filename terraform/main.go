@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	"github.com/matii-org/matii-secret-clients/terraform/internal/provider"
+	"github.com/MATII-Technologies/matii-sc/terraform/internal/provider"
 )
 
 var version = "dev"

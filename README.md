@@ -83,7 +83,7 @@ with the command's own code.
 ```yaml
 permissions: { id-token: write, contents: read }
 steps:
-  - uses: matii-org/matii-secret-clients/action@v1
+  - uses: MATII-Technologies/matii-sc/action@v1
     with:
       host: https://secrets.example.com
       service-account-id: ${{ vars.MATII_SA_ID }}

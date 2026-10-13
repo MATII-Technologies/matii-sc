@@ -14,7 +14,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 // stringList is a repeatable flag.

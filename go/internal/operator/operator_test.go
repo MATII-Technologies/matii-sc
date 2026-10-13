@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/matii-org/matii-secret-clients/go/internal/kube"
+	"github.com/MATII-Technologies/matii-sc/go/internal/kube"
 )
 
 type fakeKube struct {

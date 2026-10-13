@@ -16,7 +16,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/matii-org/matii-secret-clients/go/matii"
+	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
 func secretsCommand(ctx context.Context, sub string, args []string, stdout, stderr io.Writer) error {
