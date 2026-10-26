@@ -113,6 +113,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 	case "completion":
 		err = completionCommand(args[1:], stdout)
 	default:
+		if code, ok := dispatchPlugin(args, stdout, stderr); ok {
+			return code
+		}
 		fmt.Fprintf(stderr, "matii: unknown command %q\n", args[0])
 		usage(stderr)
 		return 2
@@ -166,6 +169,10 @@ Dynamic secrets:
   dynamic list
   dynamic lease  NAME [--ttl 1h] [--format dotenv|json|shell]
   dynamic leases NAME
+
+Packages (when matii-pkg is installed; see matii pkg --help):
+  pkg <command>           any Matii Package Platform command (matii pkg init, ...)
+  add | install | publish | search | info | audit | login | whoami | ...   forwarded to matii-pkg
 
 Other:
   console [--app-only]    open the console (at this project's environment)
