@@ -284,5 +284,5 @@ func randomDelimiter() (string, error) {
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
-	return "MATII_EOF_" + hex.EncodeToString(b), nil
+	return "ADERA_EOF_" + hex.EncodeToString(b), nil
 }

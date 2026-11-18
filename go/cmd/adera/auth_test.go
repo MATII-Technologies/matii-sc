@@ -88,8 +88,8 @@ func TestCallbackAcceptsOneEncryptedTokenFromTheConsole(t *testing.T) {
 }
 
 func TestCredentialsRoundTripAndPermissions(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "matii", "credentials.json")
-	t.Setenv("MATII_CREDENTIALS_FILE", path)
+	path := filepath.Join(t.TempDir(), "adera", "credentials.json")
+	t.Setenv("ADERA_CREDENTIALS_FILE", path)
 	if _, err := storeAccount(credentials{ID: "a1", Host: origin, Token: "t", Email: "e"}); err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +111,7 @@ func TestCredentialsRoundTripAndPermissions(t *testing.T) {
 
 func TestCredentialStoreAccounts(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "credentials.json")
-	t.Setenv("MATII_CREDENTIALS_FILE", path)
+	t.Setenv("ADERA_CREDENTIALS_FILE", path)
 	// A file written by an older version: one account at the top level.
 	if err := os.WriteFile(path, []byte(`{"host":"`+origin+`","token":"old","email":"a@x"}`), 0o600); err != nil {
 		t.Fatal(err)
@@ -175,8 +175,8 @@ func TestPersonalAccessTokensParse(t *testing.T) {
 }
 
 func TestWebauthURLIsBase64OfTheRequest(t *testing.T) {
-	u := webauthURL(origin, 4242, strings.Repeat("ab", 32), "matii_cli@laptop")
-	want := origin + "/webauth/" + url.PathEscape(base64.StdEncoding.EncodeToString([]byte("4242-"+strings.Repeat("ab", 32)+"-matii_cli@laptop")))
+	u := webauthURL(origin, 4242, strings.Repeat("ab", 32), "adera_cli@laptop")
+	want := origin + "/webauth/" + url.PathEscape(base64.StdEncoding.EncodeToString([]byte("4242-"+strings.Repeat("ab", 32)+"-adera_cli@laptop")))
 	if u != want {
 		t.Fatalf("%s", u)
 	}

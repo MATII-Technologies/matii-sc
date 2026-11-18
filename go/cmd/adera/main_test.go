@@ -27,7 +27,7 @@ func TestGithubEnvMasksBeforeExporting(t *testing.T) {
 		}
 	}
 	written, _ := os.ReadFile(envFile)
-	if !strings.HasPrefix(string(written), "PEM<<MATII_EOF_") || !strings.Contains(string(written), "\nabc\n") {
+	if !strings.HasPrefix(string(written), "PEM<<ADERA_EOF_") || !strings.Contains(string(written), "\nabc\n") {
 		t.Fatalf("env file: %q", written)
 	}
 	if strings.Contains(string(written), "H<<") {

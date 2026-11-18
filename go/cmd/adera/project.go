@@ -1,7 +1,7 @@
 package main
 
-// Project configuration: `matii init` links a directory to an app and a
-// default environment by writing .matii.json. Commands look for it in the
+// Project configuration: `adera init` links a directory to an app and a
+// default environment by writing .adera.json. Commands look for it in the
 // current directory, then in parent directories whose file sets
 // monorepoSupport (so one file at a monorepo root covers every package).
 
@@ -19,7 +19,7 @@ import (
 	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
-const projectFile = ".matii.json"
+const projectFile = ".adera.json"
 
 // maxProjectDepth is how many parent directories are searched.
 const maxProjectDepth = 8
@@ -46,7 +46,7 @@ func findProject() (*project, string, error) {
 		if err == nil {
 			var p project
 			if err := json.Unmarshal(b, &p); err != nil || (p.AppID == "" && p.AppName == "") {
-				return nil, path, fmt.Errorf("%s is not valid; run matii init again", path)
+				return nil, path, fmt.Errorf("%s is not valid; run adera init again", path)
 			}
 			if depth == 0 || p.MonorepoSupport {
 				return &p, path, nil
@@ -71,11 +71,11 @@ func initCommand(ctx context.Context, args []string, stdout, stderr io.Writer) e
 	appID := fs.String("app-id", "", "app id")
 	env := fs.String("env", "", "default environment")
 	monorepo := fs.Bool("monorepo", false, "also apply to subdirectories")
-	force := fs.Bool("force", false, "overwrite an existing .matii.json")
+	force := fs.Bool("force", false, "overwrite an existing .adera.json")
 	if pos, _, _, err := parseArgs(fs, args); err != nil {
 		return err
 	} else if len(pos) > 0 {
-		return usagef("usage: matii init [--app APP | --app-id ID] [--env ENV] [--monorepo]")
+		return usagef("usage: adera init [--app APP | --app-id ID] [--env ENV] [--monorepo]")
 	}
 	if _, err := os.Stat(projectFile); err == nil && !*force {
 		if !isTerminal(os.Stdin) {

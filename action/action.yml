@@ -40,18 +40,18 @@ runs:
       with:
         go-version-file: ${{ github.action_path }}/../go/go.mod
         cache-dependency-path: ${{ github.action_path }}/../go/go.sum
-    - name: Build matii CLI
+    - name: Build adera CLI
       shell: bash
       working-directory: ${{ github.action_path }}/../go
-      run: go build -trimpath -o "$RUNNER_TEMP/matii" ./cmd/matii
+      run: go build -trimpath -o "$RUNNER_TEMP/adera" ./cmd/adera
     - name: Load secrets
       shell: bash
       env:
-        MATII_HOST: ${{ inputs.host }}
-        MATII_TOKEN: ${{ inputs.token }}
-        MATII_SERVICE_ACCOUNT_ID: ${{ inputs.service-account-id }}
-        MATII_OIDC_PROVIDER: github-actions
-        MATII_OIDC_AUDIENCE: ${{ inputs.audience }}
+        ADERA_HOST: ${{ inputs.host }}
+        ADERA_TOKEN: ${{ inputs.token }}
+        ADERA_SERVICE_ACCOUNT_ID: ${{ inputs.service-account-id }}
+        ADERA_OIDC_PROVIDER: github-actions
+        ADERA_OIDC_AUDIENCE: ${{ inputs.audience }}
         INPUT_APP: ${{ inputs.app }}
         INPUT_ENV: ${{ inputs.env }}
         INPUT_PATH: ${{ inputs.path }}
@@ -59,16 +59,16 @@ runs:
         INPUT_DOTENV_FILE: ${{ inputs.dotenv-file }}
       run: |
         set -euo pipefail
-        if [ -z "${MATII_TOKEN}" ] && [ -z "${MATII_SERVICE_ACCOUNT_ID}" ]; then
+        if [ -z "${ADERA_TOKEN}" ] && [ -z "${ADERA_SERVICE_ACCOUNT_ID}" ]; then
           echo "::error::Set service-account-id (recommended, OIDC) or token." >&2; exit 1
         fi
-        [ -n "${MATII_TOKEN}" ] || unset MATII_TOKEN
+        [ -n "${ADERA_TOKEN}" ] || unset ADERA_TOKEN
         args=(--app "$INPUT_APP" --env "$INPUT_ENV")
         [ -z "$INPUT_PATH" ] || args+=(--path "$INPUT_PATH")
         if [ "$INPUT_EXPORT_ENV" = "true" ]; then
-          "$RUNNER_TEMP/matii" secrets export "${args[@]}" --format github
+          "$RUNNER_TEMP/adera" secrets export "${args[@]}" --format github
         fi
         if [ -n "$INPUT_DOTENV_FILE" ]; then
           umask 077
-          "$RUNNER_TEMP/matii" secrets export "${args[@]}" --format dotenv > "$INPUT_DOTENV_FILE"
+          "$RUNNER_TEMP/adera" secrets export "${args[@]}" --format dotenv > "$INPUT_DOTENV_FILE"
         fi

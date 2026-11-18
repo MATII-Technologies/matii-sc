@@ -100,17 +100,17 @@ func TestProjectLookup(t *testing.T) {
 	if err != nil || p.AppID != "id1" {
 		t.Fatalf("monorepo lookup: %v %+v", err, p)
 	}
-	for _, k := range []string{"MATII_APP", "MATII_APP_ID", "MATII_ENV"} {
+	for _, k := range []string{"ADERA_APP", "ADERA_APP_ID", "ADERA_ENV"} {
 		t.Setenv(k, "")
 	}
 	tg := &target{env: "staging"}
 	if err := tg.complete(); err != nil || tg.appID != "id1" || tg.env != "staging" {
 		t.Fatalf("flags must win over the file: %v %+v", err, tg)
 	}
-	t.Setenv("MATII_APP", "Other")
+	t.Setenv("ADERA_APP", "Other")
 	tg = &target{}
 	if err := tg.complete(); err != nil || tg.app != "Other" || tg.appID != "" || tg.env != "development" {
-		t.Fatalf("MATII_APP must win over the file: %+v", tg)
+		t.Fatalf("ADERA_APP must win over the file: %+v", tg)
 	}
 }
 
@@ -132,7 +132,7 @@ func TestRunUsage(t *testing.T) {
 		t.Fatalf("unquoted multi-word command without -- should be a usage error, got %d", code)
 	}
 	var out bytes.Buffer
-	if code := run([]string{"completion", "bash"}, &out, &stderr); code != 0 || !strings.Contains(out.String(), "complete -o default -F _matii matii") {
+	if code := run([]string{"completion", "bash"}, &out, &stderr); code != 0 || !strings.Contains(out.String(), "complete -o default -F _adera adera") {
 		t.Fatalf("completion: %d %s", code, out.String())
 	}
 }

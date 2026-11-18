@@ -1,5 +1,5 @@
 name: Release
-# Tag vX.Y.Z to publish CLI binaries (matii_<os>_<arch>, SHA256SUMS, install.sh)
+# Tag vX.Y.Z to publish CLI binaries (adera_<os>_<arch>, SHA256SUMS, install.sh)
 # as release assets. Mirror them to the URL set as MATII_CLI_DOWNLOAD_URL in the
 # console. Images are pushed only when the IMAGE_REGISTRY variable is set.
 on:

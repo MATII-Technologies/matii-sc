@@ -96,7 +96,7 @@ func secretsList(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	if len(pos) > 0 {
-		return usagef("usage: matii secrets list [--show] [--app APP] [--env ENV] [--path PATH] [--tags a,b]")
+		return usagef("usage: adera secrets list [--show] [--app APP] [--env ENV] [--path PATH] [--tags a,b]")
 	}
 	client, err := newClient()
 	if err != nil {
@@ -179,7 +179,7 @@ func secretsGet(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	if len(pos) != 1 {
-		return usagef("usage: matii secrets get KEY [--format value|json] [--app APP] [--env ENV] [--path PATH]")
+		return usagef("usage: adera secrets get KEY [--format value|json] [--app APP] [--env ENV] [--path PATH]")
 	}
 	if format != "value" && format != "json" {
 		return usagef("--format must be value or json")
@@ -303,7 +303,7 @@ func requireUser(ctx context.Context, client *matii.Client) error {
 		return err
 	}
 	if who.Kind != "User" {
-		return errors.New("personal overrides belong to people; sign in with matii auth login to use them")
+		return errors.New("personal overrides belong to people; sign in with adera auth login to use them")
 	}
 	return nil
 }
@@ -320,7 +320,7 @@ func secretsCreate(ctx context.Context, args []string, stdout, stderr io.Writer)
 		return err
 	}
 	if len(pos) > 1 {
-		return usagef("usage: matii secrets create [KEY] [--random TYPE] [--length N] [--comment TEXT] [--tags a,b] [--path PATH]")
+		return usagef("usage: adera secrets create [KEY] [--random TYPE] [--length N] [--comment TEXT] [--tags a,b] [--path PATH]")
 	}
 	if err := validType(typ); err != nil {
 		return err
@@ -335,7 +335,7 @@ func secretsCreate(ctx context.Context, args []string, stdout, stderr io.Writer)
 	}
 	key = strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(key), " ", "_"))
 	if key == "" {
-		return usagef("a key is required: matii secrets create KEY")
+		return usagef("a key is required: adera secrets create KEY")
 	}
 	client, err := newClient()
 	if err != nil {
@@ -357,7 +357,7 @@ func secretsCreate(ctx context.Context, args []string, stdout, stderr io.Writer)
 	if err := client.CreateSecrets(ctx, t.query(), []matii.StoredSecret{secret}); err != nil {
 		var apiErr *matii.APIError
 		if errors.As(err, &apiErr) && apiErr.Status == 409 {
-			return fmt.Errorf("%s already exists in %s; use matii secrets update", key, displayPath(t.path))
+			return fmt.Errorf("%s already exists in %s; use adera secrets update", key, displayPath(t.path))
 		}
 		return err
 	}
@@ -410,7 +410,7 @@ func secretsUpdate(ctx context.Context, args []string, stdout, stderr io.Writer)
 		return err
 	}
 	if len(pos) != 1 {
-		return usagef("usage: matii secrets update KEY [--random TYPE] [--updated-path PATH] [--comment TEXT] [--override] [--toggle-override]")
+		return usagef("usage: adera secrets update KEY [--random TYPE] [--updated-path PATH] [--comment TEXT] [--override] [--toggle-override]")
 	}
 	if err := validType(typ); err != nil {
 		return err
@@ -465,7 +465,7 @@ func secretsUpdate(ctx context.Context, args []string, stdout, stderr io.Writer)
 			return err
 		}
 		if value == "" && !isTerminal(os.Stdin) && v.random == "" {
-			return errors.New("no value on stdin; pipe the new value, e.g. echo -n VALUE | matii secrets update KEY")
+			return errors.New("no value on stdin; pipe the new value, e.g. echo -n VALUE | adera secrets update KEY")
 		}
 		if v.override {
 			s.Override = &matii.Override{Value: value, Active: true}
@@ -495,7 +495,7 @@ func secretsDelete(ctx context.Context, args []string, stdout, stderr io.Writer)
 		return err
 	}
 	if len(pos) == 0 {
-		return usagef("usage: matii secrets delete KEY... [--path PATH]")
+		return usagef("usage: adera secrets delete KEY... [--path PATH]")
 	}
 	client, err := newClient()
 	if err != nil {
@@ -543,7 +543,7 @@ func secretsImport(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	if len(pos) != 1 {
-		return usagef("usage: matii secrets import FILE|- [--path PATH] [--tags a,b]")
+		return usagef("usage: adera secrets import FILE|- [--path PATH] [--tags a,b]")
 	}
 	var data []byte
 	if pos[0] == "-" {
