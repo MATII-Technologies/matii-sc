@@ -55,4 +55,4 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: sh -n install.sh && scripts/dist.sh ci-check
-      - run: docker build -f Dockerfile.cli -t matii-cli . && docker build -f Dockerfile.operator -t matii-operator . && docker build -f Dockerfile.csi -t matii-csi .
+      - run: docker build -f Dockerfile.cli -t adera-cli . && docker build -f Dockerfile.operator -t matii-operator . && docker build -f Dockerfile.csi -t matii-csi .

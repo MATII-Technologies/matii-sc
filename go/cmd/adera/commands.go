@@ -41,7 +41,7 @@ func dynamicList(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	if len(pos) > 0 {
-		return usagef("usage: matii dynamic list [--app APP] [--env ENV] [--path PATH]")
+		return usagef("usage: adera dynamic list [--app APP] [--env ENV] [--path PATH]")
 	}
 	client, err := newClient()
 	if err != nil {
@@ -75,7 +75,7 @@ func dynamicLease(ctx context.Context, args []string, stdout, stderr io.Writer) 
 		return err
 	}
 	if len(pos) != 1 {
-		return usagef("usage: matii dynamic lease NAME [--ttl 1h] [--format dotenv|json|shell]")
+		return usagef("usage: adera dynamic lease NAME [--ttl 1h] [--format dotenv|json|shell]")
 	}
 	render, ok := exporters[format]
 	if !ok || (format != "dotenv" && format != "json" && format != "shell") {
@@ -89,7 +89,7 @@ func dynamicLease(ctx context.Context, args []string, stdout, stderr io.Writer) 
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(stderr, "matii: lease %s; credentials expire at %s\n", lease.ID, lease.ExpiresAt.Local().Format(time.RFC1123))
+	fmt.Fprintf(stderr, "adera: lease %s; credentials expire at %s\n", lease.ID, lease.ExpiresAt.Local().Format(time.RFC1123))
 	fmt.Fprint(stdout, render(lease.Credentials))
 	return nil
 }
@@ -100,7 +100,7 @@ func dynamicLeases(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	if len(pos) != 1 {
-		return usagef("usage: matii dynamic leases NAME [--app APP] [--env ENV] [--path PATH]")
+		return usagef("usage: adera dynamic leases NAME [--app APP] [--env ENV] [--path PATH]")
 	}
 	client, err := newClient()
 	if err != nil {
@@ -148,11 +148,11 @@ func whoami(ctx context.Context, stdout io.Writer) error {
 		return err
 	}
 	host, _ := consoleHost()
-	source := "the MATII_* environment"
+	source := "the ADERA_* environment"
 	name := ""
-	if os.Getenv("MATII_TOKEN") == "" && os.Getenv("MATII_TOKEN_FILE") == "" && os.Getenv("MATII_SERVICE_ACCOUNT_ID") == "" {
+	if os.Getenv("ADERA_TOKEN") == "" && os.Getenv("ADERA_TOKEN_FILE") == "" && os.Getenv("ADERA_SERVICE_ACCOUNT_ID") == "" {
 		if c, err := loadCredentials(); err == nil {
-			source, name = "matii auth login", c.Email
+			source, name = "adera auth login", c.Email
 		}
 	}
 	kind := map[string]string{"User": "person (personal access token)", "ServiceAccount": "service account"}[who.Kind]
@@ -168,17 +168,17 @@ func whoami(ctx context.Context, stdout io.Writer) error {
 func switchAccount(args []string, stdout, stderr io.Writer) error {
 	store, err := loadStore()
 	if errors.Is(err, os.ErrNotExist) {
-		return errors.New("not signed in (matii auth login)")
+		return errors.New("not signed in (adera auth login)")
 	}
 	if err != nil {
 		return err
 	}
 	if len(store.Accounts) == 0 {
-		return errors.New("not signed in (matii auth login)")
+		return errors.New("not signed in (adera auth login)")
 	}
 	var chosen *credentials
 	if len(args) > 1 {
-		return usagef("usage: matii users switch [EMAIL | ACCOUNT-ID]")
+		return usagef("usage: adera users switch [EMAIL | ACCOUNT-ID]")
 	}
 	if len(args) == 1 {
 		for i, a := range store.Accounts {
@@ -222,7 +222,7 @@ func consoleCommand(ctx context.Context, args []string, stdout io.Writer) error 
 	if pos, _, _, err := parseArgs(fs, args); err != nil {
 		return err
 	} else if len(pos) > 0 {
-		return usagef("usage: matii console [--app APP] [--env ENV]")
+		return usagef("usage: adera console [--app APP] [--env ENV]")
 	}
 	host, err := consoleHost()
 	if err != nil {
@@ -255,7 +255,7 @@ func docsCommand(stdout io.Writer) error {
 // download's checksum, and installs over the running binary.
 func updateCommand(ctx context.Context, stdout, stderr io.Writer) error {
 	if runtime.GOOS == "windows" {
-		return errors.New("download the new matii.exe from your console's CLI page")
+		return errors.New("download the new adera.exe from your console's CLI page")
 	}
 	host, err := consoleHost()
 	if err != nil {
@@ -290,7 +290,7 @@ func updateCommand(ctx context.Context, stdout, stderr io.Writer) error {
 	cmd := exec.CommandContext(ctx, "/bin/sh", "-s")
 	cmd.Stdin = strings.NewReader(string(script))
 	cmd.Stdout, cmd.Stderr = stdout, stderr
-	cmd.Env = append(os.Environ(), "MATII_INSTALL_DIR="+filepath.Dir(self))
+	cmd.Env = append(os.Environ(), "ADERA_INSTALL_DIR="+filepath.Dir(self))
 	fmt.Fprintf(stdout, "Updating %s (currently %s) from %s…\n", self, version, host)
 	return cmd.Run()
 }
@@ -309,7 +309,7 @@ var completionWords = map[string][]string{
 
 func completionCommand(args []string, stdout io.Writer) error {
 	if len(args) != 1 {
-		return usagef("usage: matii completion bash|zsh|fish")
+		return usagef("usage: adera completion bash|zsh|fish")
 	}
 	top := strings.Join(completionWords[""], " ")
 	switch args[0] {
@@ -318,19 +318,19 @@ func completionCommand(args []string, stdout io.Writer) error {
 		if args[0] == "zsh" {
 			b.WriteString("autoload -U +X bashcompinit && bashcompinit\n")
 		}
-		b.WriteString("_matii() {\n  local cur=${COMP_WORDS[COMP_CWORD]} words\n  if [ \"$COMP_CWORD\" -eq 1 ]; then words=\"" + top + "\"\n  else case \"${COMP_WORDS[1]}\" in\n")
+		b.WriteString("_adera() {\n  local cur=${COMP_WORDS[COMP_CWORD]} words\n  if [ \"$COMP_CWORD\" -eq 1 ]; then words=\"" + top + "\"\n  else case \"${COMP_WORDS[1]}\" in\n")
 		for _, cmd := range []string{"auth", "secrets", "dynamic", "dynamic-secrets", "users", "completion"} {
 			fmt.Fprintf(&b, "    %s) [ \"$COMP_CWORD\" -eq 2 ] && words=%q ;;\n", cmd, strings.Join(completionWords[cmd], " "))
 		}
-		b.WriteString("  esac; fi\n  COMPREPLY=($(compgen -W \"$words\" -- \"$cur\"))\n}\ncomplete -o default -F _matii matii\n")
+		b.WriteString("  esac; fi\n  COMPREPLY=($(compgen -W \"$words\" -- \"$cur\"))\n}\ncomplete -o default -F _adera adera\n")
 		fmt.Fprint(stdout, b.String())
 	case "fish":
-		fmt.Fprintf(stdout, "complete -c matii -f -n __fish_use_subcommand -a %q\n", top)
+		fmt.Fprintf(stdout, "complete -c adera -f -n __fish_use_subcommand -a %q\n", top)
 		for _, cmd := range []string{"auth", "secrets", "dynamic", "users", "completion"} {
-			fmt.Fprintf(stdout, "complete -c matii -f -n '__fish_seen_subcommand_from %s' -a %q\n", cmd, strings.Join(completionWords[cmd], " "))
+			fmt.Fprintf(stdout, "complete -c adera -f -n '__fish_seen_subcommand_from %s' -a %q\n", cmd, strings.Join(completionWords[cmd], " "))
 		}
 	default:
-		return usagef("usage: matii completion bash|zsh|fish")
+		return usagef("usage: adera completion bash|zsh|fish")
 	}
 	return nil
 }

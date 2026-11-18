@@ -15,7 +15,11 @@ func fakePlugin(t *testing.T, name, script string) {
 		t.Skip("shell-script plugins")
 	}
 	dir := t.TempDir()
-	p := filepath.Join(dir, "matii-"+name)
+	exe := "adera-" + name
+	if name == "pkg" {
+		exe = "matii-pkg"
+	}
+	p := filepath.Join(dir, exe)
 	if err := os.WriteFile(p, []byte("#!/bin/sh\n"+script+"\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +38,7 @@ func TestPackageCommandsForwardToMatiiPkg(t *testing.T) {
 	}
 	// Built-in commands are never shadowed by plugins.
 	out.Reset()
-	if code := run([]string{"version"}, &out, &errOut); code != 0 || !strings.HasPrefix(out.String(), "matii ") {
+	if code := run([]string{"version"}, &out, &errOut); code != 0 || !strings.HasPrefix(out.String(), "adera ") {
 		t.Fatalf("built-in version shadowed: %q", out.String())
 	}
 }

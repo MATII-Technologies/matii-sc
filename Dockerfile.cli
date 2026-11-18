@@ -3,9 +3,9 @@ WORKDIR /src
 COPY go/go.mod go/go.sum ./
 RUN go mod download
 COPY go/ ./
-RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /matii ./cmd/matii
+RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /adera ./cmd/adera
 
 FROM gcr.io/distroless/static-debian12:nonroot
-COPY --from=build /matii /usr/local/bin/matii
+COPY --from=build /adera /usr/local/bin/adera
 USER 10001:10001
-ENTRYPOINT ["/usr/local/bin/matii"]
+ENTRYPOINT ["/usr/local/bin/adera"]

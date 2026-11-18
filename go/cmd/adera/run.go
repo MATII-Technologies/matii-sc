@@ -58,8 +58,8 @@ func secretEnv(t *target, dynamic []string, ttl time.Duration) ([]string, int, e
 }
 
 // runCommand executes a program with the environment's secrets in its
-// environment: `matii run [flags] -- program args...`, or a single command
-// string run by the shell: `matii run "npm run dev"`.
+// environment: `adera run [flags] -- program args...`, or a single command
+// string run by the shell: `adera run "npm run dev"`.
 func runCommand(args []string, stderr io.Writer) int {
 	fs := flag.NewFlagSet("run", flag.ContinueOnError)
 	t := addTarget(fs)
@@ -75,8 +75,8 @@ func runCommand(args []string, stderr io.Writer) int {
 	case !dashed && len(pos) == 1:
 		argv = shellCommandLine(pos[0])
 	default:
-		fmt.Fprintln(stderr, `usage: matii run [--app APP] [--env ENV] -- command [args...]
-       matii run [--app APP] [--env ENV] "command string"`)
+		fmt.Fprintln(stderr, `usage: adera run [--app APP] [--env ENV] -- command [args...]
+       adera run [--app APP] [--env ENV] "command string"`)
 		return 2
 	}
 	if err := t.complete(); err != nil {
@@ -102,7 +102,7 @@ func execWithEnv(argv, env []string, stderr io.Writer) int {
 	cmd := exec.Command(argv[0], argv[1:]...)
 	cmd.Env, cmd.Stdin, cmd.Stdout, cmd.Stderr = env, os.Stdin, os.Stdout, os.Stderr
 	if err := cmd.Start(); err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 127
 	}
 	signals := make(chan os.Signal, 4)
@@ -135,14 +135,14 @@ func shellCommand(args []string, stderr io.Writer) int {
 		return exitCode(err, stderr)
 	}
 	if len(pos) > 0 {
-		fmt.Fprintln(stderr, "usage: matii shell [--shell bash|zsh|fish|...] [--app APP] [--env ENV]")
+		fmt.Fprintln(stderr, "usage: adera shell [--shell bash|zsh|fish|...] [--app APP] [--env ENV]")
 		return 2
 	}
 	if err := t.complete(); err != nil {
 		return exitCode(err, stderr)
 	}
-	if os.Getenv("MATII_SHELL") != "" {
-		fmt.Fprintln(stderr, "matii: already inside a matii shell; type exit to leave it first")
+	if os.Getenv("ADERA_SHELL") != "" {
+		fmt.Fprintln(stderr, "adera: already inside a adera shell; type exit to leave it first")
 		return 1
 	}
 	program := *shell
@@ -166,9 +166,9 @@ func shellCommand(args []string, stderr io.Writer) int {
 	if label == "" {
 		label = t.appID
 	}
-	env = append(env, "MATII_SHELL=1", "MATII_SHELL_APP="+label, "MATII_SHELL_ENV="+t.env)
-	fmt.Fprintf(stderr, "matii: %s shell with %d secret(s) from %s (%s). Type exit to leave.\n", filepath.Base(program), count, label, t.env)
+	env = append(env, "ADERA_SHELL=1", "ADERA_SHELL_APP="+label, "ADERA_SHELL_ENV="+t.env)
+	fmt.Fprintf(stderr, "adera: %s shell with %d secret(s) from %s (%s). Type exit to leave.\n", filepath.Base(program), count, label, t.env)
 	code := execWithEnv([]string{program}, env, stderr)
-	fmt.Fprintln(stderr, "matii: left the shell; its secrets are gone with it.")
+	fmt.Fprintln(stderr, "adera: left the shell; its secrets are gone with it.")
 	return code
 }

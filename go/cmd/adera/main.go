@@ -1,25 +1,25 @@
-// Command matii is the command-line client of the Matii Secret Service.
+// Command adera is the command-line client of the Matii Secret Service.
 //
-//	matii auth login | status | logout      sign in (browser, or --token)
-//	matii init                              link this directory to an app and environment
-//	matii secrets list|get|create|update|delete|import|export
-//	matii run -- command                    run a program with secrets in its environment
-//	matii shell                             open a shell with secrets in its environment
-//	matii dynamic list|lease|leases         dynamic (short-lived) credentials
-//	matii users whoami|switch|logout        accounts
-//	matii console | docs | update | completion | version
+//	adera auth login | status | logout      sign in (browser, or --token)
+//	adera init                              link this directory to an app and environment
+//	adera secrets list|get|create|update|delete|import|export
+//	adera run -- command                    run a program with secrets in its environment
+//	adera shell                             open a shell with secrets in its environment
+//	adera dynamic list|lease|leases         dynamic (short-lived) credentials
+//	adera users whoami|switch|logout        accounts
+//	adera console | docs | update | completion | version
 //
 // The app and environment come from --app/--app-id and --env, else
-// MATII_APP/MATII_APP_ID and MATII_ENV, else .matii.json (matii init).
+// ADERA_APP/ADERA_APP_ID and ADERA_ENV, else .adera.json (adera init).
 //
-// Authentication (environment variables, else the account from matii auth login):
+// Authentication (environment variables, else the account from adera auth login):
 //
-//	MATII_HOST                  console URL, e.g. https://secrets.example.com
-//	MATII_TOKEN / MATII_TOKEN_FILE        a service account token (pss_service:v2:...)
+//	ADERA_HOST                  console URL, e.g. https://secrets.example.com
+//	ADERA_TOKEN / ADERA_TOKEN_FILE        a service account token (pss_service:v2:...)
 //	or workload identity (no stored token):
-//	MATII_SERVICE_ACCOUNT_ID    service account with an OIDC identity attached
-//	MATII_OIDC_TOKEN_FILE       e.g. a Kubernetes projected token path, or
-//	MATII_OIDC_PROVIDER=github-actions with MATII_OIDC_AUDIENCE (default matii-secret-service)
+//	ADERA_SERVICE_ACCOUNT_ID    service account with an OIDC identity attached
+//	ADERA_OIDC_TOKEN_FILE       e.g. a Kubernetes projected token path, or
+//	ADERA_OIDC_PROVIDER=github-actions with ADERA_OIDC_AUDIENCE (default matii-secret-service)
 package main
 
 import (
@@ -41,7 +41,7 @@ import (
 	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
-var version = "0.1.0-dev"
+var version = "1.0.0"
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
@@ -64,7 +64,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	var err error
 	switch args[0] {
 	case "version", "--version", "-v":
-		fmt.Fprintln(stdout, "matii", version)
+		fmt.Fprintln(stdout, "adera", version)
 		return 0
 	case "help", "-h", "--help":
 		usage(stdout)
@@ -116,7 +116,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		if code, ok := dispatchPlugin(args, stdout, stderr); ok {
 			return code
 		}
-		fmt.Fprintf(stderr, "matii: unknown command %q\n", args[0])
+		fmt.Fprintf(stderr, "adera: unknown command %q\n", args[0])
 		usage(stderr)
 		return 2
 	}
@@ -127,7 +127,7 @@ func exitCode(err error, stderr io.Writer) int {
 	if err == nil {
 		return 0
 	}
-	fmt.Fprintln(stderr, "matii:", err)
+	fmt.Fprintln(stderr, "adera:", err)
 	var apiErr *matii.APIError
 	var uErr usageError
 	switch {
@@ -140,7 +140,7 @@ func exitCode(err error, stderr io.Writer) int {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, `usage: matii COMMAND [flags]
+	fmt.Fprintln(w, `usage: adera COMMAND [flags]
 
 Account:
   auth login   [--host URL] [--no-browser] [--token]   sign in (browser, or paste a token)
@@ -148,7 +148,7 @@ Account:
   users whoami | switch [ACCOUNT] | logout [--purge]
 
 Project:
-  init         [--app APP | --app-id ID] [--env ENV] [--monorepo]   writes .matii.json
+  init         [--app APP | --app-id ID] [--env ENV] [--monorepo]   writes .adera.json
 
 Secrets (target flags: --app APP | --app-id ID, --env ENV, --path PATH, --tags a,b):
   secrets list    [--show]
@@ -170,19 +170,19 @@ Dynamic secrets:
   dynamic lease  NAME [--ttl 1h] [--format dotenv|json|shell]
   dynamic leases NAME
 
-Packages (when matii-pkg is installed; see matii pkg --help):
-  pkg <command>           any Matii Package Platform command (matii pkg init, ...)
+Packages (when matii-pkg is installed; see adera pkg --help):
+  pkg <command>           any Matii Package Platform command (adera pkg init, ...)
   add | install | publish | search | info | audit | login | whoami | ...   forwarded to matii-pkg
 
 Other:
   console [--app-only]    open the console (at this project's environment)
   docs                    open the user guides
-  update                  install the latest matii from your console
+  update                  install the latest adera from your console
   completion bash|zsh|fish
   version
 
-The app and environment come from flags, else MATII_APP / MATII_APP_ID / MATII_ENV, else .matii.json.
-Sign in with matii auth login, or set MATII_HOST and MATII_TOKEN (or workload identity; see docs).`)
+The app and environment come from flags, else ADERA_APP / ADERA_APP_ID / ADERA_ENV, else .adera.json.
+Sign in with adera auth login, or set ADERA_HOST and ADERA_TOKEN (or workload identity; see docs).`)
 }
 
 // --- flags and target ---------------------------------------------------------------
@@ -201,13 +201,13 @@ func addTarget(fs *flag.FlagSet) *target {
 	return t
 }
 
-// complete fills the app and environment from MATII_* variables and .matii.json.
+// complete fills the app and environment from ADERA_* variables and .adera.json.
 func (t *target) complete() error {
 	if t.app == "" && t.appID == "" {
-		t.app, t.appID = os.Getenv("MATII_APP"), os.Getenv("MATII_APP_ID")
+		t.app, t.appID = os.Getenv("ADERA_APP"), os.Getenv("ADERA_APP_ID")
 	}
 	if t.env == "" {
-		t.env = os.Getenv("MATII_ENV")
+		t.env = os.Getenv("ADERA_ENV")
 	}
 	if (t.app == "" && t.appID == "") || t.env == "" {
 		if p, _, err := findProject(); err == nil {
@@ -222,7 +222,7 @@ func (t *target) complete() error {
 		}
 	}
 	if (t.app == "" && t.appID == "") || t.env == "" {
-		return usagef("--app (or --app-id) and --env are required (or run matii init)")
+		return usagef("--app (or --app-id) and --env are required (or run adera init)")
 	}
 	return nil
 }
@@ -285,16 +285,16 @@ func parseArgs(fs *flag.FlagSet, args []string) (positional, afterDash []string,
 func httpClient(targetURL string) *http.Client {
 	u, _ := url.Parse(targetURL)
 	isLocal := u != nil && (u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" || u.Hostname() == "::1")
-	insecure := os.Getenv("MATII_TLS_SKIP_VERIFY") == "true" ||
-		os.Getenv("MATII_TLS_SKIP_VERIFY") == "1" ||
-		os.Getenv("MATII_INSECURE_TLS") == "true" ||
-		os.Getenv("MATII_INSECURE_TLS") == "1" ||
-		(isLocal && os.Getenv("MATII_STRICT_TLS") != "true")
+	insecure := os.Getenv("ADERA_TLS_SKIP_VERIFY") == "true" ||
+		os.Getenv("ADERA_TLS_SKIP_VERIFY") == "1" ||
+		os.Getenv("ADERA_INSECURE_TLS") == "true" ||
+		os.Getenv("ADERA_INSECURE_TLS") == "1" ||
+		(isLocal && os.Getenv("ADERA_STRICT_TLS") != "true")
 	if insecure {
 		return &http.Client{
 			Timeout: 30 * time.Second,
 			Transport: &http.Transport{
-				Proxy: http.ProxyFromEnvironment,
+				Proxy:           http.ProxyFromEnvironment,
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		}
@@ -303,14 +303,14 @@ func httpClient(targetURL string) *http.Client {
 }
 
 func newClient() (*matii.Client, error) {
-	host := os.Getenv("MATII_HOST")
-	apiBase := os.Getenv("MATII_API_BASE")
+	host := os.Getenv("ADERA_HOST")
+	apiBase := os.Getenv("ADERA_API_BASE")
 	if host == "" && apiBase == "" {
-		// Fall back to `matii auth login` credentials.
+		// Fall back to `adera auth login` credentials.
 		if c, err := loadCredentials(); err == nil {
 			host = c.Host
 		} else {
-			return nil, errors.New("sign in with matii auth login, or set MATII_HOST (e.g. https://secrets.example.com)")
+			return nil, errors.New("sign in with adera auth login, or set ADERA_HOST (e.g. https://secrets.example.com)")
 		}
 	}
 	if apiBase == "" {
@@ -323,47 +323,47 @@ func newClient() (*matii.Client, error) {
 	return matii.New(matii.Config{APIBase: apiBase, Tokens: tokens, HTTPClient: httpClient(apiBase)})
 }
 
-// consoleHost is the console URL for links (MATII_HOST, else the signed-in account).
+// consoleHost is the console URL for links (ADERA_HOST, else the signed-in account).
 func consoleHost() (string, error) {
-	if h := os.Getenv("MATII_HOST"); h != "" {
+	if h := os.Getenv("ADERA_HOST"); h != "" {
 		return strings.TrimRight(h, "/"), nil
 	}
 	if c, err := loadCredentials(); err == nil {
 		return c.Host, nil
 	}
-	return "", errors.New("sign in with matii auth login, or set MATII_HOST")
+	return "", errors.New("sign in with adera auth login, or set ADERA_HOST")
 }
 
 func tokenSource(apiBase string) (matii.TokenSource, error) {
-	if raw := os.Getenv("MATII_TOKEN"); raw != "" {
+	if raw := os.Getenv("ADERA_TOKEN"); raw != "" {
 		return matii.StaticToken(raw)
 	}
-	if path := os.Getenv("MATII_TOKEN_FILE"); path != "" {
+	if path := os.Getenv("ADERA_TOKEN_FILE"); path != "" {
 		b, err := os.ReadFile(path)
 		if err != nil {
 			return nil, err
 		}
 		return matii.StaticToken(string(b))
 	}
-	saID := os.Getenv("MATII_SERVICE_ACCOUNT_ID")
+	saID := os.Getenv("ADERA_SERVICE_ACCOUNT_ID")
 	if saID == "" {
 		if c, err := loadCredentials(); err == nil && strings.TrimRight(c.Host, "/")+"/service" == strings.TrimRight(apiBase, "/") {
 			return matii.StaticToken(c.Token)
 		}
-		return nil, errors.New("sign in with matii auth login, or set MATII_TOKEN, MATII_TOKEN_FILE, or MATII_SERVICE_ACCOUNT_ID for workload identity")
+		return nil, errors.New("sign in with adera auth login, or set ADERA_TOKEN, ADERA_TOKEN_FILE, or ADERA_SERVICE_ACCOUNT_ID for workload identity")
 	}
 	source := &matii.OIDCTokenSource{APIBase: apiBase, ServiceAccountID: saID}
 	switch {
-	case os.Getenv("MATII_OIDC_TOKEN_FILE") != "":
-		source.JWT = matii.FileJWT(os.Getenv("MATII_OIDC_TOKEN_FILE"))
-	case os.Getenv("MATII_OIDC_PROVIDER") == "github-actions":
-		audience := os.Getenv("MATII_OIDC_AUDIENCE")
+	case os.Getenv("ADERA_OIDC_TOKEN_FILE") != "":
+		source.JWT = matii.FileJWT(os.Getenv("ADERA_OIDC_TOKEN_FILE"))
+	case os.Getenv("ADERA_OIDC_PROVIDER") == "github-actions":
+		audience := os.Getenv("ADERA_OIDC_AUDIENCE")
 		if audience == "" {
 			audience = "matii-secret-service"
 		}
 		source.JWT = matii.GitHubActionsJWT(audience, nil)
 	default:
-		return nil, errors.New("workload identity needs MATII_OIDC_TOKEN_FILE or MATII_OIDC_PROVIDER=github-actions")
+		return nil, errors.New("workload identity needs ADERA_OIDC_TOKEN_FILE or ADERA_OIDC_PROVIDER=github-actions")
 	}
 	return source, nil
 }

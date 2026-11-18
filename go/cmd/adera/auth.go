@@ -1,6 +1,6 @@
 package main
 
-// Interactive sign-in for people: `matii auth login` opens the console's web
+// Interactive sign-in for people: `adera auth login` opens the console's web
 // authentication page, which creates a personal access token for the signed-in
 // member, encrypts it to a key pair generated here, and posts it to a listener
 // on 127.0.0.1. The token is stored in the user's config directory (0600).
@@ -49,7 +49,7 @@ func (c *credentials) label() string {
 	return who + " on " + c.Host
 }
 
-// credentialStore is what `matii auth login` stores: every signed-in account
+// credentialStore is what `adera auth login` stores: every signed-in account
 // and the one in use. Files written by older versions hold one account's
 // fields at the top level and are read as a single account.
 type credentialStore struct {
@@ -104,14 +104,14 @@ func newAccountID() string {
 }
 
 func credentialsPath() (string, error) {
-	if p := os.Getenv("MATII_CREDENTIALS_FILE"); p != "" {
+	if p := os.Getenv("ADERA_CREDENTIALS_FILE"); p != "" {
 		return p, nil
 	}
 	dir, err := os.UserConfigDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "matii", "credentials.json"), nil
+	return filepath.Join(dir, "adera", "credentials.json"), nil
 }
 
 // loadCredentials returns the account in use.
@@ -142,7 +142,7 @@ func loadStore() (*credentialStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	invalid := fmt.Errorf("%s is not valid; run matii auth login again", path)
+	invalid := fmt.Errorf("%s is not valid; run adera auth login again", path)
 	var store credentialStore
 	if err := json.Unmarshal(b, &store); err != nil {
 		return nil, invalid
@@ -189,7 +189,7 @@ func verificationCode(publicKeyHex string) string {
 
 func authCommand(args []string, stdout, stderr io.Writer) int {
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
-		args = append([]string{"login"}, args...) // `matii auth` signs in
+		args = append([]string{"login"}, args...) // `adera auth` signs in
 	}
 	switch args[0] {
 	case "login":
@@ -197,7 +197,7 @@ func authCommand(args []string, stdout, stderr io.Writer) int {
 	case "status":
 		c, err := loadCredentials()
 		if err != nil {
-			fmt.Fprintln(stdout, "Not signed in (matii auth login).")
+			fmt.Fprintln(stdout, "Not signed in (adera auth login).")
 			return 3
 		}
 		who := c.Email
@@ -209,7 +209,7 @@ func authCommand(args []string, stdout, stderr io.Writer) int {
 	case "logout":
 		return logout(false, stdout, stderr)
 	default:
-		fmt.Fprintln(stderr, "usage: matii auth login|status|logout")
+		fmt.Fprintln(stderr, "usage: adera auth login|status|logout")
 		return 2
 	}
 }
@@ -217,8 +217,8 @@ func authCommand(args []string, stdout, stderr io.Writer) int {
 func authLogin(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("login", flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	host := fs.String("host", os.Getenv("MATII_HOST"), "console URL, e.g. https://secrets.example.com")
-	name := fs.String("name", "", "name for the personal access token (default: matii_cli@<hostname>)")
+	host := fs.String("host", os.Getenv("ADERA_HOST"), "console URL, e.g. https://secrets.example.com")
+	name := fs.String("name", "", "name for the personal access token (default: adera_cli@<hostname>)")
 	noBrowser := fs.Bool("no-browser", false, "print the URL instead of opening a browser")
 	withToken := fs.Bool("token", false, "paste a token (personal access token or service account token) instead of using the browser")
 	if err := fs.Parse(args); err != nil {
@@ -229,7 +229,7 @@ func authLogin(args []string, stdout, stderr io.Writer) int {
 	}
 	origin, err := consoleOrigin(*host)
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 2
 	}
 	if *withToken {
@@ -238,20 +238,20 @@ func authLogin(args []string, stdout, stderr io.Writer) int {
 	tokenName := *name
 	if tokenName == "" {
 		hn, _ := os.Hostname()
-		tokenName = "matii_cli@" + hn
+		tokenName = "adera_cli@" + hn
 	}
 	tokenName = sanitizeTokenName(tokenName)
 
 	result, err := webLogin(origin, tokenName, *noBrowser, stdout)
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 1
 	}
 	path, err := storeAccount(credentials{
 		ID: newAccountID(), Host: origin, Token: result.token, Email: result.email, Created: time.Now().UTC().Format(time.RFC3339),
 	})
 	if err != nil {
-		fmt.Fprintln(stderr, "matii: could not store the token:", err)
+		fmt.Fprintln(stderr, "adera: could not store the token:", err)
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed in to %s as %s. Token stored in %s.\n", origin, result.email, path)
@@ -281,30 +281,30 @@ func tokenLogin(origin string, stdout, stderr io.Writer) int {
 		raw, err = readStdin()
 	}
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 1
 	}
 	raw = strings.TrimSpace(raw)
 	tokens, err := matii.StaticToken(raw)
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 2
 	}
 	client, err := matii.New(matii.Config{Host: origin, Tokens: tokens, HTTPClient: httpClient(origin)})
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 2
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	who, err := client.Whoami(ctx)
 	if err != nil {
-		fmt.Fprintln(stderr, "matii: the token was not accepted:", err)
+		fmt.Fprintln(stderr, "adera: the token was not accepted:", err)
 		return 3
 	}
 	path, err := storeAccount(credentials{ID: newAccountID(), Host: origin, Token: raw, Created: time.Now().UTC().Format(time.RFC3339)})
 	if err != nil {
-		fmt.Fprintln(stderr, "matii: could not store the token:", err)
+		fmt.Fprintln(stderr, "adera: could not store the token:", err)
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed in to %s (%s token, organisation %s). Token stored in %s.\n", origin, who.Kind, who.OrganisationName, path)
@@ -319,13 +319,13 @@ func logout(purge bool, stdout, stderr io.Writer) int {
 		return 0
 	}
 	if err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 1
 	}
 	path, _ := credentialsPath()
 	if purge || len(store.Accounts) <= 1 {
 		if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
-			fmt.Fprintln(stderr, "matii:", err)
+			fmt.Fprintln(stderr, "adera:", err)
 			return 1
 		}
 		fmt.Fprintln(stdout, "Signed out of every account. The tokens still exist on the server: delete them in the console under Account → Personal access tokens.")
@@ -334,7 +334,7 @@ func logout(purge bool, stdout, stderr io.Writer) int {
 	current := store.current()
 	store.remove(current.ID)
 	if _, err := saveStore(store); err != nil {
-		fmt.Fprintln(stderr, "matii:", err)
+		fmt.Fprintln(stderr, "adera:", err)
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed out of %s; now using %s. The token still exists on the server: delete it in the console under Account → Personal access tokens.\n", current.label(), store.current().label())
@@ -343,7 +343,7 @@ func logout(purge bool, stdout, stderr io.Writer) int {
 
 func consoleOrigin(raw string) (string, error) {
 	if raw == "" {
-		return "", errors.New("give --host (or set MATII_HOST), e.g. --host https://secrets.example.com")
+		return "", errors.New("give --host (or set ADERA_HOST), e.g. --host https://secrets.example.com")
 	}
 	u, err := url.Parse(strings.TrimRight(raw, "/"))
 	if err != nil || u.Host == "" {
