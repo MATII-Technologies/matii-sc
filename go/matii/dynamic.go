@@ -22,7 +22,7 @@ func (l *DynamicLease) String() string { return "dynamic lease " + l.ID + " (red
 // environment (and folder) of q. ttl 0 uses the definition's default.
 func (c *Client) LeaseDynamic(ctx context.Context, q Query, name string, ttl time.Duration) (*DynamicLease, error) {
 	if name == "" {
-		return nil, errors.New("matii: dynamic secret name is required")
+		return nil, errors.New("adera: dynamic secret name is required")
 	}
 	info, _, err := c.info(ctx)
 	if err != nil {

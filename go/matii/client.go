@@ -50,7 +50,7 @@ type APIError struct {
 	Message string
 }
 
-func (e *APIError) Error() string { return fmt.Sprintf("matii: HTTP %d: %s", e.Status, e.Message) }
+func (e *APIError) Error() string { return fmt.Sprintf("adera: HTTP %d: %s", e.Status, e.Message) }
 
 // Secret is one decrypted secret. String() never prints the value.
 type Secret struct {
@@ -79,21 +79,21 @@ type Query struct {
 // New validates cfg and returns a Client.
 func New(cfg Config) (*Client, error) {
 	if cfg.Tokens == nil {
-		return nil, errors.New("matii: Config.Tokens is required")
+		return nil, errors.New("adera: Config.Tokens is required")
 	}
 	base := strings.TrimRight(cfg.APIBase, "/")
 	if base == "" {
 		if cfg.Host == "" {
-			return nil, errors.New("matii: Config.Host is required")
+			return nil, errors.New("adera: Config.Host is required")
 		}
 		base = strings.TrimRight(cfg.Host, "/") + "/service"
 	}
 	parsed, err := url.Parse(base)
 	if err != nil || parsed.Host == "" {
-		return nil, errors.New("matii: invalid Host/APIBase")
+		return nil, errors.New("adera: invalid Host/APIBase")
 	}
 	if parsed.Scheme != "https" && !isLocal(parsed.Hostname()) {
-		return nil, errors.New("matii: the API must use https (plain http only for localhost)")
+		return nil, errors.New("adera: the API must use https (plain http only for localhost)")
 	}
 	hc := cfg.HTTPClient
 	if hc == nil {
@@ -253,12 +253,12 @@ func (info *bootstrapInfo) resolve(q Query) (*appKeys, *envKey, error) {
 				return app, &app.EnvironmentKeys[prefixed[0]], nil
 			}
 			if len(prefixed) > 1 {
-				return nil, nil, fmt.Errorf("matii: environment %q of app %q is ambiguous", q.Env, app.Name)
+				return nil, nil, fmt.Errorf("adera: environment %q of app %q is ambiguous", q.Env, app.Name)
 			}
-			return nil, nil, fmt.Errorf("matii: this token has no access to environment %q of app %q", q.Env, app.Name)
+			return nil, nil, fmt.Errorf("adera: this token has no access to environment %q of app %q", q.Env, app.Name)
 		}
 	}
-	return nil, nil, errors.New("matii: this token has no access to that app")
+	return nil, nil, errors.New("adera: this token has no access to that app")
 }
 
 // App is an app the token can access, with its environments.

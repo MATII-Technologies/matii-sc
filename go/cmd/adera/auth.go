@@ -229,7 +229,7 @@ func authLogin(args []string, stdout, stderr io.Writer) int {
 	}
 	origin, err := consoleOrigin(*host)
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 2
 	}
 	if *withToken {
@@ -244,14 +244,14 @@ func authLogin(args []string, stdout, stderr io.Writer) int {
 
 	result, err := webLogin(origin, tokenName, *noBrowser, stdout)
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 1
 	}
 	path, err := storeAccount(credentials{
 		ID: newAccountID(), Host: origin, Token: result.token, Email: result.email, Created: time.Now().UTC().Format(time.RFC3339),
 	})
 	if err != nil {
-		fmt.Fprintln(stderr, "adera: could not store the token:", err)
+		fmt.Fprintln(stderr, "adera: could not store the token:", errText(err))
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed in to %s as %s. Token stored in %s.\n", origin, result.email, path)
@@ -281,30 +281,30 @@ func tokenLogin(origin string, stdout, stderr io.Writer) int {
 		raw, err = readStdin()
 	}
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 1
 	}
 	raw = strings.TrimSpace(raw)
 	tokens, err := matii.StaticToken(raw)
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 2
 	}
 	client, err := matii.New(matii.Config{Host: origin, Tokens: tokens, HTTPClient: httpClient(origin)})
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 2
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	who, err := client.Whoami(ctx)
 	if err != nil {
-		fmt.Fprintln(stderr, "adera: the token was not accepted:", err)
+		fmt.Fprintln(stderr, "adera: the token was not accepted:", errText(err))
 		return 3
 	}
 	path, err := storeAccount(credentials{ID: newAccountID(), Host: origin, Token: raw, Created: time.Now().UTC().Format(time.RFC3339)})
 	if err != nil {
-		fmt.Fprintln(stderr, "adera: could not store the token:", err)
+		fmt.Fprintln(stderr, "adera: could not store the token:", errText(err))
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed in to %s (%s token, organisation %s). Token stored in %s.\n", origin, who.Kind, who.OrganisationName, path)
@@ -319,13 +319,13 @@ func logout(purge bool, stdout, stderr io.Writer) int {
 		return 0
 	}
 	if err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 1
 	}
 	path, _ := credentialsPath()
 	if purge || len(store.Accounts) <= 1 {
 		if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
-			fmt.Fprintln(stderr, "adera:", err)
+			fmt.Fprintln(stderr, "adera:", errText(err))
 			return 1
 		}
 		fmt.Fprintln(stdout, "Signed out of every account. The tokens still exist on the server: delete them in the console under Account → Personal access tokens.")
@@ -334,7 +334,7 @@ func logout(purge bool, stdout, stderr io.Writer) int {
 	current := store.current()
 	store.remove(current.ID)
 	if _, err := saveStore(store); err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 1
 	}
 	fmt.Fprintf(stdout, "Signed out of %s; now using %s. The token still exists on the server: delete it in the console under Account → Personal access tokens.\n", current.label(), store.current().label())

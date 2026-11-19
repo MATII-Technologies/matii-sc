@@ -18,7 +18,7 @@ type ManagedSecret struct {
 }
 
 // ErrNotFound is returned when a secret does not exist (or is not visible).
-var ErrNotFound = errors.New("matii: not found")
+var ErrNotFound = errors.New("adera: not found")
 
 type apiManaged struct {
 	ID      string  `json:"id"`
@@ -38,7 +38,7 @@ func (c *Client) sseTarget(ctx context.Context, q Query) (url.Values, error) {
 		return nil, err
 	}
 	if app.Encryption != "SSE" {
-		return nil, errors.New("matii: managing secrets through the API needs a server-side encrypted app")
+		return nil, errors.New("adera: managing secrets through the API needs a server-side encrypted app")
 	}
 	return url.Values{"app_id": {app.ID}, "env": {key.Environment.Name}}, nil
 }
@@ -252,7 +252,7 @@ func (c *Client) CreateSecrets(ctx context.Context, q Query, secrets []StoredSec
 	for _, s := range secrets {
 		key := normalizeKey(s.Key)
 		if key == "" {
-			return errors.New("matii: secret key is empty")
+			return errors.New("adera: secret key is empty")
 		}
 		path := s.Path
 		if path == "" {
@@ -297,7 +297,7 @@ func (c *Client) UpdateSecrets(ctx context.Context, q Query, secrets []StoredSec
 	body := make([]map[string]any, 0, len(secrets))
 	for _, s := range secrets {
 		if s.ID == "" {
-			return errors.New("matii: UpdateSecrets needs secrets with IDs (from ListSecrets)")
+			return errors.New("adera: UpdateSecrets needs secrets with IDs (from ListSecrets)")
 		}
 		item := map[string]any{"id": s.ID, "path": normalizePath(s.Path), "tags": nonNil(s.Tags), "type": secretType(s.Type)}
 		fields := map[string]string{"comment": s.Comment}

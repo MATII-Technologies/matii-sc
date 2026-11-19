@@ -22,7 +22,7 @@ func ParseToken(raw string) (*Token, error) {
 	raw = strings.TrimSpace(raw)
 	parts := strings.Split(raw, ":")
 	if len(parts) != 6 || !(parts[1] == "v2" || (parts[0] == "pss_user" && parts[1] == "v1")) {
-		return nil, errors.New("matii: unsupported token format (expected pss_service:v2 or pss_user:v1/v2)")
+		return nil, errors.New("adera: unsupported token format (expected pss_service:v2 or pss_user:v1/v2)")
 	}
 	t := &Token{value: parts[2], kxPublic: parts[3], shareA: parts[4], wrapKey: parts[5]}
 	switch parts[0] {
@@ -31,11 +31,11 @@ func ParseToken(raw string) (*Token, error) {
 	case "pss_user":
 		t.kind = "User"
 	default:
-		return nil, errors.New("matii: unknown token type")
+		return nil, errors.New("adera: unknown token type")
 	}
 	for _, field := range []string{t.value, t.kxPublic, t.shareA, t.wrapKey} {
 		if len(field) != 64 {
-			return nil, errors.New("matii: malformed token")
+			return nil, errors.New("adera: malformed token")
 		}
 	}
 	return t, nil

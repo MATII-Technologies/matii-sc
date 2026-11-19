@@ -102,7 +102,7 @@ func execWithEnv(argv, env []string, stderr io.Writer) int {
 	cmd := exec.Command(argv[0], argv[1:]...)
 	cmd.Env, cmd.Stdin, cmd.Stdout, cmd.Stderr = env, os.Stdin, os.Stdout, os.Stderr
 	if err := cmd.Start(); err != nil {
-		fmt.Fprintln(stderr, "adera:", err)
+		fmt.Fprintln(stderr, "adera:", errText(err))
 		return 127
 	}
 	signals := make(chan os.Signal, 4)

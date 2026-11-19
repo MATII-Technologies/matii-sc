@@ -22,7 +22,7 @@ import (
 )
 
 // ErrDecrypt is returned for any undecryptable or malformed ciphertext.
-var ErrDecrypt = errors.New("matii: decryption failed")
+var ErrDecrypt = errors.New("adera: decryption failed")
 
 // KeyPair is an X25519 key exchange keypair.
 type KeyPair struct {
@@ -184,7 +184,7 @@ func recoverTokenKey(t *Token, wrappedShareHex string) (KeyPair, error) {
 	}
 	expected, err := hex.DecodeString(t.kxPublic)
 	if err != nil || subtle.ConstantTimeCompare(pub, expected) != 1 {
-		return kp, errors.New("matii: token key shares do not match the token's public key")
+		return kp, errors.New("adera: token key shares do not match the token's public key")
 	}
 	copy(kp.Public[:], pub)
 	return kp, nil

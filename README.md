@@ -31,7 +31,7 @@ adera version
 ```
 
 The binary lands in `$(go env GOPATH)/bin`; add that folder to your `PATH`.
-Pin a release with `@v1.0.0`.
+Pin a release with `@v1.0.1`.
 
 ```bash
 adera auth login --host https://secrets.example.com   # browser sign-in; or --token to paste a token

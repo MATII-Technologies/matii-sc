@@ -44,3 +44,11 @@ func TestUsageErrors(t *testing.T) {
 		t.Fatal("run without -- should be a usage error")
 	}
 }
+
+func TestErrorsArePrefixedOnce(t *testing.T) {
+	var stderr bytes.Buffer
+	code := exitCode(&matii.APIError{Status: 401, Message: "Token expired or deleted"}, &stderr)
+	if got := stderr.String(); code != 3 || got != "adera: HTTP 401: Token expired or deleted\n" {
+		t.Fatalf("code=%d stderr=%q", code, got)
+	}
+}

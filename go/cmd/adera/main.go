@@ -41,7 +41,7 @@ import (
 	"github.com/MATII-Technologies/matii-sc/go/matii"
 )
 
-var version = "1.0.0"
+var version = "1.0.1"
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
@@ -123,11 +123,17 @@ func run(args []string, stdout, stderr io.Writer) int {
 	return exitCode(err, stderr)
 }
 
+// errText is err's message without the SDK's "adera: " prefix, so the CLI
+// prints "adera: HTTP 401: ..." rather than "adera: adera: HTTP 401: ...".
+func errText(err error) string {
+	return strings.TrimPrefix(err.Error(), "adera: ")
+}
+
 func exitCode(err error, stderr io.Writer) int {
 	if err == nil {
 		return 0
 	}
-	fmt.Fprintln(stderr, "adera:", err)
+	fmt.Fprintln(stderr, "adera:", errText(err))
 	var apiErr *matii.APIError
 	var uErr usageError
 	switch {

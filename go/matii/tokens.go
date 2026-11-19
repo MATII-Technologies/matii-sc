@@ -53,7 +53,7 @@ func GitHubActionsJWT(audience string, hc *http.Client) JWTSource {
 	return func(ctx context.Context) (string, error) {
 		reqURL, reqToken := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL"), os.Getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
 		if reqURL == "" || reqToken == "" {
-			return "", errors.New("matii: not in a GitHub Actions job with id-token: write permission")
+			return "", errors.New("adera: not in a GitHub Actions job with id-token: write permission")
 		}
 		if hc == nil {
 			hc = http.DefaultClient
@@ -72,7 +72,7 @@ func GitHubActionsJWT(audience string, hc *http.Client) JWTSource {
 			Value string `json:"value"`
 		}
 		if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&body); err != nil || body.Value == "" {
-			return "", fmt.Errorf("matii: GitHub did not return an ID token (HTTP %d)", resp.StatusCode)
+			return "", fmt.Errorf("adera: GitHub did not return an ID token (HTTP %d)", resp.StatusCode)
 		}
 		return body.Value, nil
 	}
