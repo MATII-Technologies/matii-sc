@@ -23,6 +23,16 @@ All clients read secrets the same way:
 The `adera` CLI covers the whole secrets workflow: sign in, link a project,
 read, write and import secrets, and run programs with secrets injected.
 
+Install it with Go 1.26 or newer (macOS, Linux, Windows):
+
+```bash
+go install github.com/MATII-Technologies/matii-sc/go/cmd/adera@latest
+adera version
+```
+
+The binary lands in `$(go env GOPATH)/bin`; add that folder to your `PATH`.
+Pin a release with `@v1.0.0`.
+
 ```bash
 adera auth login --host https://secrets.example.com   # browser sign-in; or --token to paste a token
 adera init                                            # pick an app and default environment → .adera.json
@@ -63,9 +73,9 @@ adera dynamic leases deploy --app Payments --env production
 adera run --app Payments --env production --dynamic deploy -- ./deploy.sh
 ```
 
-## Installing
+## Releasing
 
-Tag `vX.Y.Z` to publish `adera_<os>_<arch>` binaries, `SHA256SUMS` and
+Tag `go/vX.Y.Z` (for `go install` / Go modules) and `vX.Y.Z` to publish `adera_<os>_<arch>` binaries, `SHA256SUMS` and
 `install.sh` as release assets (`.github/workflows/release.yml`). Mirror them
 and set `MATII_CLI_DOWNLOAD_URL` on the console; users then run
 `curl -fsSL https://<console>/cli/install.sh | sh`, which verifies the checksum.
